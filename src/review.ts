@@ -11,7 +11,7 @@ import { SYSTEM_PROMPT, buildUserMessage } from "./prompt.js";
 import { TOOL_DEFINITIONS, executeTool } from "./tools.js";
 import { resetLog, logDecision, logNote, getLogPath } from "./logger.js";
 
-const MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-20250514";
+const MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-5-20250929";
 const MAX_TOKENS = 1024;
 
 function requireApiKey(): string {
