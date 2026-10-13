@@ -1,0 +1,50 @@
+[
+  {
+    "timestamp": "2026-10-13T15:35:13.188Z",
+    "applicationId": "A",
+    "candidateName": "Maria",
+    "score": 75,
+    "reason": "Strong relevant experience (3 years call centre, high ticket volume), Zendesk proficiency, bilingual capability, and immediate availability align well with role requirements.",
+    "toolCall": "advance_to_interview",
+    "toolInput": {
+      "score": 75,
+      "reason": "Strong relevant experience (3 years call centre, high ticket volume), Zendesk proficiency, bilingual capability, and immediate availability align well with role requirements."
+    },
+    "outcome": "Candidate advanced to interview",
+    "status": "advanced"
+  },
+  {
+    "timestamp": "2026-10-13T15:35:15.515Z",
+    "applicationId": "B",
+    "candidateName": "John",
+    "score": 8,
+    "reason": "No relevant support experience, tools familiarity, or demonstrated skills; motivation alone insufficient for role requirements.",
+    "toolCall": "reject",
+    "toolInput": {
+      "score": 8,
+      "reason": "No relevant support experience, tools familiarity, or demonstrated skills; motivation alone insufficient for role requirements."
+    },
+    "outcome": "Rejection proposed — saved as waiting_for_human_approval (agent cannot reject alone)",
+    "status": "waiting_for_human_approval"
+  },
+  {
+    "timestamp": "2026-10-13T15:35:19.979Z",
+    "applicationId": "C",
+    "candidateName": "Alex",
+    "score": 30,
+    "reason": "Minimal application detail; need specifics on tools used, ticket volume, availability, and communication skills.",
+    "toolCall": "request_more_info",
+    "toolInput": {
+      "score": 30,
+      "reason": "Minimal application detail; need specifics on tools used, ticket volume, availability, and communication skills.",
+      "questions": [
+        "Can you describe your specific responsibilities in your e-commerce support role (e.g., daily ticket volume, types of customer issues)?",
+        "What customer support tools and platforms have you used (e.g., Zendesk, Freshdesk, CRM systems)?",
+        "Are you available for full-time work and what is your earliest possible start date?",
+        "Please provide a brief example of a challenging customer issue you resolved successfully."
+      ]
+    },
+    "outcome": "More information requested from candidate",
+    "status": "info_requested"
+  }
+]

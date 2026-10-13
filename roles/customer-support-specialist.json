@@ -1,0 +1,34 @@
+{
+  "title": "Customer Support Specialist",
+  "rubric": [
+    {
+      "name": "Relevant support experience",
+      "weight": 40,
+      "guidance": "Years in CS/call centre/e-commerce support, ticket volume, complexity."
+    },
+    {
+      "name": "Tools & process familiarity",
+      "weight": 20,
+      "guidance": "Zendesk or similar ticketing, CRM, documented workflows."
+    },
+    {
+      "name": "Language & communication",
+      "weight": 15,
+      "guidance": "Clarity of writing; multilingual is a plus for this role."
+    },
+    {
+      "name": "Availability & logistics",
+      "weight": 10,
+      "guidance": "Full-time readiness, start date realism."
+    },
+    {
+      "name": "Motivation & growth signals",
+      "weight": 15,
+      "guidance": "Concrete motivation only when backed by some evidence; pure enthusiasm without experience scores low here."
+    }
+  ],
+  "thresholds": {
+    "advance": 70,
+    "requestMoreInfo": 35
+  }
+}

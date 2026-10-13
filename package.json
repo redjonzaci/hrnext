@@ -1,0 +1,22 @@
+{
+  "name": "hrnext",
+  "version": "1.0.0",
+  "description": "Tiny AI agent that reviews Customer Support Specialist job applications",
+  "type": "module",
+  "scripts": {
+    "review": "tsx src/review.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.52.0",
+    "dotenv": "^16.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}
