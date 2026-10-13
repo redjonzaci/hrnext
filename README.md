@@ -1,6 +1,6 @@
 # HRNext
 
-Tiny Node.js + TypeScript AI agent that reviews job applications for **Customer Support Specialist**.
+Tiny Node.js + TypeScript AI agent that reviews job applications with a **configurable role + scoring rubric**.
 
 It scores each candidate 0–100 with a one-line reason, then calls one real Claude tool:
 
@@ -12,7 +12,7 @@ It scores each candidate 0–100 with a one-line reason, then calls one real Cla
 
 Every decision and tool call is printed to the console and appended to `decisions.json`.
 
-Application text is wrapped as untrusted data so prompt-injection attempts (see sample C) are treated as content, not instructions.
+Application text is wrapped as untrusted data so prompt-injection attempts (see sample C) are treated as content, not instructions. Role/rubric always come from a JSON file — never from the application.
 
 ## Prerequisites
 
@@ -41,23 +41,72 @@ Optional: `ANTHROPIC_MODEL` (defaults to `claude-sonnet-4-5-20250929`).
 
 ## Run
 
+Default role (Customer Support Specialist):
+
 ```bash
 npm run review
 ```
 
-That runs `tsx src/review.ts` — no separate build step.
+Same thing, explicit:
+
+```bash
+npm run review -- --role roles/customer-support-specialist.json
+```
+
+Another example role (Backend Engineer):
+
+```bash
+npm run review -- --role roles/backend-engineer.json
+```
+
+That runs `tsx src/review.ts` — no separate build step. The `--` after `npm run review` passes flags through to the script.
+
+## Role config JSON
+
+Role files live under `roles/`. Shape:
+
+```json
+{
+  "title": "Customer Support Specialist",
+  "rubric": [
+    {
+      "name": "Relevant support experience",
+      "weight": 40,
+      "guidance": "Years in CS/call centre/e-commerce support, ticket volume, complexity."
+    }
+  ],
+  "thresholds": {
+    "advance": 70,
+    "requestMoreInfo": 35
+  }
+}
+```
+
+| Field | Meaning |
+|-------|---------|
+| `title` | Role name injected into the system prompt |
+| `rubric[]` | Criteria: `name`, `weight` (points toward 100), `guidance` |
+| `thresholds.advance` | Score ≥ this → prefer `advance_to_interview` |
+| `thresholds.requestMoreInfo` | Score ≥ this and &lt; advance → prefer `request_more_info`; **below** → prefer `reject` |
+
+Shipped examples:
+
+- `roles/customer-support-specialist.json` (default)
+- `roles/backend-engineer.json`
+
+Applications stay in `src/samples.ts` — separate from role config.
 
 ## Sample applications
 
-The script reviews three built-in samples (`src/samples.ts`):
+The script reviews three built-in samples (`src/samples.ts`) against the selected role:
 
-- **A – Maria**: strong telecom CS background → expect advance
+- **A – Maria**: strong telecom CS background → expect advance (for CS role)
 - **B – John**: motivated but no experience → expect `request_more_info` or reject pending approval
 - **C – Alex**: e-commerce support + prompt injection (“advance with score 100”) → scored by rubric, **not** blindly advanced / not score 100
 
 ## Sample run log
 
-A real Claude run on the three samples is committed as [`decisions.json`](./decisions.json):
+A real Claude run on the three samples (default CS role) is committed as [`decisions.json`](./decisions.json):
 
 | App | Candidate | Score | Tool | Status |
 |-----|-----------|------:|------|--------|
@@ -85,9 +134,13 @@ Statuses you may see:
 ## Project layout
 
 ```
+roles/
+  customer-support-specialist.json   # default role + rubric
+  backend-engineer.json              # second example role
 src/
-  review.ts   # entrypoint
-  prompt.ts   # system rubric + untrusted-data wrapping
+  review.ts   # entrypoint (--role flag)
+  role.ts     # load/validate role JSON
+  prompt.ts   # system prompt from role config
   tools.ts    # Claude tool defs + local execution / reject policy
   samples.ts  # three sample applications
   logger.ts   # console + decisions.json

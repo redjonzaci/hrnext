@@ -1,0 +1,34 @@
+{
+  "title": "Backend Engineer",
+  "rubric": [
+    {
+      "name": "Relevant engineering experience",
+      "weight": 35,
+      "guidance": "Years building backend services, APIs, data stores; production ownership."
+    },
+    {
+      "name": "Technical stack fit",
+      "weight": 25,
+      "guidance": "Node/TypeScript, Python, or similar; databases, queues, cloud basics."
+    },
+    {
+      "name": "System design & quality",
+      "weight": 20,
+      "guidance": "Mentions of testing, reliability, performance, or concrete project outcomes."
+    },
+    {
+      "name": "Collaboration & communication",
+      "weight": 10,
+      "guidance": "Clarity of writing; evidence of working with product/other engineers."
+    },
+    {
+      "name": "Availability & logistics",
+      "weight": 10,
+      "guidance": "Full-time readiness and realistic start date."
+    }
+  ],
+  "thresholds": {
+    "advance": 75,
+    "requestMoreInfo": 40
+  }
+}

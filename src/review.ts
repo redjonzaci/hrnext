@@ -1,15 +1,21 @@
 /**
- * HRNext — review Customer Support Specialist applications via Claude tool calling.
+ * HRNext — review job applications via Claude tool calling.
  *
  * Run: npm install && npm run review
+ * Role: npm run review -- --role roles/backend-engineer.json
  * Requires ANTHROPIC_API_KEY in .env (see .env.example).
  */
 import "dotenv/config";
 import Anthropic from "@anthropic-ai/sdk";
 import { APPLICATIONS } from "./samples.js";
-import { SYSTEM_PROMPT, buildUserMessage } from "./prompt.js";
+import { buildSystemPrompt, buildUserMessage } from "./prompt.js";
 import { TOOL_DEFINITIONS, executeTool } from "./tools.js";
 import { resetLog, logDecision, logNote, getLogPath } from "./logger.js";
+import {
+  loadRoleConfig,
+  parseRolePath,
+  type RoleConfig,
+} from "./role.js";
 
 const MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-5-20250929";
 const MAX_TOKENS = 1024;
@@ -38,6 +44,8 @@ function asRecord(value: unknown): Record<string, unknown> {
 
 async function reviewOne(
   client: Anthropic,
+  role: RoleConfig,
+  systemPrompt: string,
   application: (typeof APPLICATIONS)[number],
 ): Promise<void> {
   logNote(`\n── Reviewing application ${application.id} (${application.name}) ──`);
@@ -45,13 +53,13 @@ async function reviewOne(
   const response = await client.messages.create({
     model: MODEL,
     max_tokens: MAX_TOKENS,
-    system: SYSTEM_PROMPT,
+    system: systemPrompt,
     tools: TOOL_DEFINITIONS,
     tool_choice: { type: "any" },
     messages: [
       {
         role: "user",
-        content: buildUserMessage(application.text),
+        content: buildUserMessage(role.title, application.text),
       },
     ],
   });
@@ -111,7 +119,6 @@ async function reviewOne(
     `  → tool=${result.tool} status=${result.status} score=${score ?? "?"} reason=${reason ?? "?"}`,
   );
 
-  // Acknowledge tool result to Claude (good practice; not required for our offline log).
   if (toolBlocks.length > 1) {
     logNote(
       `  (ignored ${toolBlocks.length - 1} extra tool call(s); one decision per application)`,
@@ -120,15 +127,23 @@ async function reviewOne(
 }
 
 async function main(): Promise<void> {
+  const rolePath = parseRolePath(process.argv);
+  const role = loadRoleConfig(rolePath);
+  const systemPrompt = buildSystemPrompt(role);
+
   const apiKey = requireApiKey();
   const client = new Anthropic({ apiKey });
 
   resetLog();
   logNote(`HRNext starting — model=${MODEL}`);
+  logNote(`Role: ${role.title} (from ${rolePath})`);
+  logNote(
+    `Thresholds: advance≥${role.thresholds.advance}, request_more_info≥${role.thresholds.requestMoreInfo}, reject below that`,
+  );
   logNote(`Decisions will be written to ${getLogPath()}`);
 
   for (const application of APPLICATIONS) {
-    await reviewOne(client, application);
+    await reviewOne(client, role, systemPrompt, application);
   }
 
   logNote(`\nDone. Logged ${APPLICATIONS.length} reviews → ${getLogPath()}`);
