@@ -37,7 +37,7 @@ Edit `.env` and set:
 ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-Optional: `ANTHROPIC_MODEL` (defaults to `claude-sonnet-4-5-20250929`).
+Optional: `ANTHROPIC_MODEL` (defaults to `claude-sonnet-5-5`).
 
 ## Run
 

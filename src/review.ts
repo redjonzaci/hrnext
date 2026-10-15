@@ -17,7 +17,7 @@ import {
   type RoleConfig,
 } from "./role.js";
 
-const MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-5-20250929";
+const MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-5-5";
 const MAX_TOKENS = 1024;
 
 function requireApiKey(): string {
