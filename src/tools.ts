@@ -17,12 +17,13 @@ export type ToolResult = {
   status: "advanced" | "waiting_for_human_approval" | "info_requested";
 };
 
-/** Claude tool definitions (real function calling). */
+/** Claude tool definitions (real function calling; strict for Sonnet 5.5). */
 export const TOOL_DEFINITIONS: Anthropic.Tool[] = [
   {
     name: "advance_to_interview",
     description:
       "Advance the candidate to the interview stage. Use when the score and fit justify progressing.",
+    strict: true,
     input_schema: {
       type: "object",
       properties: {
@@ -36,12 +37,14 @@ export const TOOL_DEFINITIONS: Anthropic.Tool[] = [
         },
       },
       required: ["score", "reason"],
+      additionalProperties: false,
     },
   },
   {
     name: "reject",
     description:
       "Propose rejecting the candidate. This does NOT reject immediately — it queues for human approval.",
+    strict: true,
     input_schema: {
       type: "object",
       properties: {
@@ -55,12 +58,14 @@ export const TOOL_DEFINITIONS: Anthropic.Tool[] = [
         },
       },
       required: ["score", "reason"],
+      additionalProperties: false,
     },
   },
   {
     name: "request_more_info",
     description:
       "Ask the candidate for more information before deciding. Use when the application is incomplete or ambiguous.",
+    strict: true,
     input_schema: {
       type: "object",
       properties: {
@@ -78,7 +83,8 @@ export const TOOL_DEFINITIONS: Anthropic.Tool[] = [
           description: "Specific questions to ask the candidate.",
         },
       },
-      required: ["score", "reason"],
+      required: ["score", "reason", "questions"],
+      additionalProperties: false,
     },
   },
 ];

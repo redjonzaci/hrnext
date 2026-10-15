@@ -18,7 +18,8 @@ import {
 } from "./role.js";
 
 const MODEL = process.env.ANTHROPIC_MODEL ?? "claude-sonnet-5-5";
-const MAX_TOKENS = 1024;
+/** Sonnet 5.5 uses adaptive thinking; leave headroom beyond a short tool call. */
+const MAX_TOKENS = 4096;
 
 function requireApiKey(): string {
   const key = process.env.ANTHROPIC_API_KEY?.trim();
@@ -50,23 +51,47 @@ async function reviewOne(
 ): Promise<void> {
   logNote(`\n── Reviewing application ${application.id} (${application.name}) ──`);
 
-  const response = await client.messages.create({
+  // Sonnet 5.5 rejects tool_choice "any"/"tool" — use auto + strict tools + prompt.
+  const messages: Anthropic.MessageParam[] = [
+    {
+      role: "user",
+      content: buildUserMessage(role.title, application.text),
+    },
+  ];
+
+  let response = await client.messages.create({
     model: MODEL,
     max_tokens: MAX_TOKENS,
     system: systemPrompt,
     tools: TOOL_DEFINITIONS,
-    tool_choice: { type: "any" },
-    messages: [
-      {
-        role: "user",
-        content: buildUserMessage(role.title, application.text),
-      },
-    ],
+    tool_choice: { type: "auto" },
+    messages,
   });
 
-  const toolBlocks = response.content.filter(
+  let toolBlocks = response.content.filter(
     (block): block is Anthropic.ToolUseBlock => block.type === "tool_use",
   );
+
+  // One nudge if the model replies in text only (forced tool_choice is unavailable).
+  if (toolBlocks.length === 0) {
+    messages.push({ role: "assistant", content: response.content });
+    messages.push({
+      role: "user",
+      content:
+        "You must call exactly one of the tools (advance_to_interview, reject, or request_more_info) now. Do not reply with text only.",
+    });
+    response = await client.messages.create({
+      model: MODEL,
+      max_tokens: MAX_TOKENS,
+      system: systemPrompt,
+      tools: TOOL_DEFINITIONS,
+      tool_choice: { type: "auto" },
+      messages,
+    });
+    toolBlocks = response.content.filter(
+      (block): block is Anthropic.ToolUseBlock => block.type === "tool_use",
+    );
+  }
 
   if (toolBlocks.length === 0) {
     const text = response.content
